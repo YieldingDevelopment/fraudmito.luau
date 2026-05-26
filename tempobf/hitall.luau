@@ -1,10 +1,3 @@
--- Mahito Hit/Fling all.
-
--- 5 reacts and i drop src code
-
--- made 5/25/26 last edited: 9:31 PM CST 
-
-
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -15,66 +8,66 @@ local switchDelay = 0.001
 local running = false
 
 local function getHRP(char)
-    return char and char:FindFirstChild("HumanoidRootPart")
+	return char and char:FindFirstChild("HumanoidRootPart")
 end
 
 local function isValidPosition(hrp)
-    local pos = hrp.Position
-
-    if pos.X > 1000 then return false end
-    if pos.Y < -2500 then return false end
-
-    return true
+	local pos = hrp.Position
+	
+	if pos.X > 1000 then return false end
+	if pos.Y < -2500 then return false end
+	
+	return true
 end
 
 local function startSwitching()
-    if running then return end
-    running = true
+	if running then return end
+	running = true
 
-    task.spawn(function()
-        while running do
-            for , player in ipairs(Players:GetPlayers()) do
-                if player ~= LocalPlayer then
-                    local myHRP = getHRP(LocalPlayer.Character)
-                    local targetHRP = getHRP(player.Character)
+	task.spawn(function()
+		while running do
+			for _, player in ipairs(Players:GetPlayers()) do
+				if player ~= LocalPlayer then
+					local myHRP = getHRP(LocalPlayer.Character)
+					local targetHRP = getHRP(player.Character)
 
-                    if myHRP and targetHRP and isValidPosition(targetHRP) then
-                        myHRP.CFrame = targetHRP.CFrame
-                        task.wait(switchDelay)
-                    end
-                end
-            end
-            task.wait()
-        end
-    end)
+					if myHRP and targetHRP and isValidPosition(targetHRP) then
+						myHRP.CFrame = targetHRP.CFrame
+						task.wait(switchDelay)
+					end
+				end
+			end
+			task.wait()
+		end
+	end)
 end
 
 local function stopSwitching()
-    running = false
+	running = false
 end
 
 local function monitorAnimation()
-    local char = LocalPlayer.Character
-    if not char then return end
+	local char = LocalPlayer.Character
+	if not char then return end
+	
+	local humanoid = char:FindFirstChildOfClass("Humanoid")
+	if not humanoid then return end
+	
+	local animator = humanoid:FindFirstChildOfClass("Animator")
+	if not animator then return end
 
-    local humanoid = char:FindFirstChildOfClass("Humanoid")
-    if not humanoid then return end
-
-    local animator = humanoid:FindFirstChildOfClass("Animator")
-    if not animator then return end
-
-    for , track in ipairs(animator:GetPlayingAnimationTracks()) do
-        if track.Animation and track.Animation.AnimationId == "rbxassetid://116811846715462" then
-            track.Stopped:Connect(function()
-                stopSwitching()
-            end)
-        end
-    end
+	for _, track in ipairs(animator:GetPlayingAnimationTracks()) do
+		if track.Animation and track.Animation.AnimationId == "rbxassetid://116811846715462" then
+			track.Stopped:Connect(function()
+				stopSwitching()
+			end)
+		end
+	end
 end
 
 Event.OnClientEvent:Connect(function(action, character)
-    if action == "Domain" and character == LocalPlayer.Character then
-        startSwitching()
-        task.delay(0.1, monitorAnimation) -- slight delay so animation exists
-    end
+	if action == "Domain" and character == LocalPlayer.Character then
+		startSwitching()
+		task.delay(0.1, monitorAnimation) -- slight delay so animation exists
+	end
 end)
